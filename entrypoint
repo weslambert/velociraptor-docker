@@ -1,0 +1,22 @@
+#!/bin/bash
+VERSION="0.3.9"
+BIND_ADDRESS="0.0.0.0"
+PUBLIC_PATH="public"
+LOG_DIR="."
+SERVER_URL="https://velociraptor:8000/"
+USER="admin"
+PASSWORD="admin"
+DATASTORE_LOCATION="."
+FILESTORE_DIRECTORY="."
+
+if [ ! -f server.config.yaml ]; then
+	./velociraptor config generate > server.config.yaml --merge '{"Frontend": {"public_path":"'$PUBLIC_PATH'"}, "API": { "bind_address": "'$BIND_ADDRESS'" }, "GUI": { "bind_address": "'$BIND_ADDRESS'"}, "Monitoring": {"bind_address": "'$BIND_ADDRESS'" }, "Logging": {"output_directory":"'$LOG_DIR'","separate_logs_per_component": true, "Client": { "server_urls": ["'$SERVER_URL'"]}, "Datastore": {"location": "'$DATASTORE_LOCATION'", "filestore_directory": "'$FILESTORE_DIRECTORY'"}}}'
+        sed -i "s#https://localhost:8000/#$SERVER_URL#" server.config.yaml
+	sed -i 's#/tmp/velociraptor#.#'g server.config.yaml
+	./velociraptor --config server.config.yaml user add $USER $PASSWORD
+	./velociraptor --config server.config.yaml config client > client.config.yaml
+	./velociraptor config repack --exe clients/windows/velociraptor_client.exe client.config.yaml clients/windows/velociraptor_client_repacked.exe
+fi
+cd /velociraptor
+#/bin/bash
+./velociraptor --config server.config.yaml frontend -v

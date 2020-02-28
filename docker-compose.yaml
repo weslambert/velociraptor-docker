@@ -1,0 +1,12 @@
+version: '2'
+services:
+  velox:
+    container_name: velociraptor
+    image: wlambert/velociraptor
+    volumes:
+      - ./velociraptor/:/velociraptor/:rw
+      - ./entrypoint:/entrypoint:ro
+    ports:
+      - "8000:8000"
+      - "8889:8889"
+    restart: unless-stopped
