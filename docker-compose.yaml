@@ -11,5 +11,6 @@ services:
         #- ./entrypoint:/entrypoint:ro
     ports:
       - "8000:8000"
+      - "8001:8001"
       - "8889:8889"
     restart: unless-stopped
