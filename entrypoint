@@ -1,22 +1,37 @@
 #!/bin/bash
-VERSION="0.3.9"
+#VERSION="0.4.5"
 BIND_ADDRESS="0.0.0.0"
 PUBLIC_PATH="public"
 LOG_DIR="."
-SERVER_URL="https://velociraptor:8000/"
+SERVER_URL="https://VelociraptorServer:8000/"
 USER="admin"
 PASSWORD="admin"
-DATASTORE_LOCATION="."
-FILESTORE_DIRECTORY="."
+ROLE="administrator"
+DATASTORE_LOCATION="./"
+FILESTORE_DIRECTORY="./"
+CLIENT_DIR="/velociraptor/clients"
 
+# Move binaries into place
+cp /opt/velociraptor/linux/velociraptor . && chmod +x velociraptor
+mkdir -p $CLIENT_DIR/linux && cp /opt/velociraptor/linux/velociraptor /velociraptor/clients/linux/velociraptor_client
+mkdir -p $CLIENT_DIR/mac && mv /opt/velociraptor/mac/velociraptor_client /velociraptor/clients/mac/velociraptor_client
+mkdir -p $CLIENT_DIR/windows && mv /opt/velociraptor/windows/velociraptor_client.exe /velociraptor/clients/windows/velociraptor_client.exe
+
+# If no existing server config, set it up
 if [ ! -f server.config.yaml ]; then
-	./velociraptor config generate > server.config.yaml --merge '{"Frontend": {"public_path":"'$PUBLIC_PATH'"}, "API": { "bind_address": "'$BIND_ADDRESS'" }, "GUI": { "bind_address": "'$BIND_ADDRESS'"}, "Monitoring": {"bind_address": "'$BIND_ADDRESS'" }, "Logging": {"output_directory":"'$LOG_DIR'","separate_logs_per_component": true, "Client": { "server_urls": ["'$SERVER_URL'"]}, "Datastore": {"location": "'$DATASTORE_LOCATION'", "filestore_directory": "'$FILESTORE_DIRECTORY'"}}}'
+	./velociraptor config generate > server.config.yaml --merge '{"Frontend":{"public_path":"'$PUBLIC_PATH'"},"API":{"bind_address":"'$BIND_ADDRESS'"},"GUI":{"bind_address":"'$BIND_ADDRESS'"},"Monitoring":{"bind_address":"'$BIND_ADDRESS'"},"Logging":{"output_directory":"'$LOG_DIR'","separate_logs_per_component":true},"Client":{"server_urls":["'$SERVER_URL'"],"use_self_signed_ssl":true}, "Datastore":{"location":"'$DATASTORE_LOCATION'", "filestore_directory":"'$FILESTORE_DIRECTORY'"}}'
         sed -i "s#https://localhost:8000/#$SERVER_URL#" server.config.yaml
 	sed -i 's#/tmp/velociraptor#.#'g server.config.yaml
-	./velociraptor --config server.config.yaml user add $USER $PASSWORD
-	./velociraptor --config server.config.yaml config client > client.config.yaml
-	./velociraptor config repack --exe clients/windows/velociraptor_client.exe client.config.yaml clients/windows/velociraptor_client_repacked.exe
+	./velociraptor --config server.config.yaml user add $USER $PASSWORD --role $ROLE
 fi
-cd /velociraptor
-#/bin/bash
+
+# Re-generate client config in case server config changed
+./velociraptor --config server.config.yaml config client > client.config.yaml
+
+# Repack clients
+./velociraptor config repack --exe clients/linux/velociraptor_client client.config.yaml clients/linux/velociraptor_client_repacked
+./velociraptor config repack --exe clients/mac/velociraptor_client client.config.yaml clients/mac/velociraptor_client_repacked
+./velociraptor config repack --exe clients/windows/velociraptor_client.exe client.config.yaml clients/windows/velociraptor_client_repacked.exe
+
+# Start Velocoraptor
 ./velociraptor --config server.config.yaml frontend -v

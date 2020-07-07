@@ -1,11 +1,14 @@
 version: '2'
 services:
   velox:
-    container_name: velociraptor
+    container_name: velox
     image: wlambert/velociraptor
+    #build:
+    #  context: ./
+    #  dockerfile: Dockerfile
     volumes:
-      - ./velociraptor/:/velociraptor/:rw
-      - ./entrypoint:/entrypoint:ro
+      - ./velociraptor:/velociraptor/:rw
+        #- ./entrypoint:/entrypoint:ro
     ports:
       - "8000:8000"
       - "8889:8889"
