@@ -1,8 +1,8 @@
 FROM ubuntu:18.04
-LABEL version="Velociraptor v0.4.5"
+LABEL version="Velociraptor v0.4.6"
 LABEL description="Velociraptor server in a Docker container"
 LABEL maintainer="Wes Lambert, @therealwlambert"
-ENV VERSION="0.4.5"
+ENV VERSION="0.4.6"
 COPY ./entrypoint .
 RUN chmod +x entrypoint && \
     apt-get update && \
