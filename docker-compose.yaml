@@ -1,6 +1,6 @@
 version: '2'
 services:
-  velox:
+  velociraptor:
     container_name: velociraptor
     #image: wlambert/velociraptor
     build:
