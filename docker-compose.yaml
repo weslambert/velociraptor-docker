@@ -8,6 +8,10 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./velociraptor:/velociraptor/:rw
+    environment:
+      - VELOX_USER=${VELOX_USER}
+      - VELOX_PASSWORD=${VELOX_PASSWORD}
+      - VELOX_ROLE=${VELOX_ROLE}
     ports:
       - "8000:8000"
       - "8001:8001"
