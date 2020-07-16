@@ -6,10 +6,13 @@ Run [Velocidex Velociraptor](https://github.com/Velocidex/velociraptor) server w
 - Ensure [docker-compose](https://docs.docker.com/compose/install/) is installed on the host
 - `git clone https://github.com/weslambert/velociraptor-docker`
 - `cd velociraptor-docker`
+- Change credential values in `.env` as desired
 - `docker-compose up` (or `docker-compose -d` for detached)
 - Access the Velociraptor GUI via https://\<hostip\>:8889 
   - Default u/p is `admin/admin`
-  - This can be changed by running: `docker exec -it velox ./velociraptor --config server.config.yaml user add user1 user1 --role administrator`
+  - This can be changed by running: 
+  
+  `docker exec -it velox ./velociraptor --config server.config.yaml user add user1 user1 --role administrator`
 
 #### Notes:
 
