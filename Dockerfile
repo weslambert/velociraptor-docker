@@ -14,6 +14,7 @@ RUN chmod +x entrypoint && \
     wget -O /opt/velociraptor/linux/velociraptor https://github.com/Velocidex/velociraptor/releases/download/v$VERSION/velociraptor-v$VERSION-linux-amd64 && \
     wget -O /opt/velociraptor/mac/velociraptor_client https://github.com/Velocidex/velociraptor/releases/download/v$VERSION/velociraptor-v$VERSION-darwin-amd64 && \
     wget -O /opt/velociraptor/windows/velociraptor_client.exe https://github.com/Velocidex/velociraptor/releases/download/v$VERSION/velociraptor-v$VERSION-windows-amd64.exe && \
+    wget -O /opt/velociraptor/windows/velociraptor_client.msi https://github.com/Velocidex/velociraptor/releases/download/v$VERSION/velociraptor-v$VERSION-windows-amd64.msi && \
     # Clean up 
     apt-get remove -y --purge wget && \
     apt-get clean
