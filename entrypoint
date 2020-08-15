@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-#VERSION="0.4.5"
 BIND_ADDRESS="0.0.0.0"
 PUBLIC_PATH="public"
 LOG_DIR="."
