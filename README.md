@@ -16,7 +16,7 @@ Run [Velocidex Velociraptor](https://github.com/Velocidex/velociraptor) server w
 
 #### Notes:
 
-Linux, Mac, and Windows binaries are located in `/velociraptor/clients`, which should be mapped to the host in the `./velociraptor` directory if using `docker-compose`.  There should alos be versions of each automatically repacked based on the server configuration.
+Linux, Mac, and Windows binaries are located in `/velociraptor/clients`, which should be mapped to the host in the `./velociraptor` directory if using `docker-compose`.  There should also be versions of each automatically repacked based on the server configuration.
 
 Once started, edit `server.config.yaml` in `/velociraptor`, then run `docker-compose down/up` for the server to reflect the changes
 
