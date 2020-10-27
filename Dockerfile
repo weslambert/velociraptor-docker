@@ -1,8 +1,8 @@
 FROM ubuntu:18.04
-LABEL version="Velociraptor v0.5.0-1"
+LABEL version="Velociraptor v0.5.1"
 LABEL description="Velociraptor server in a Docker container"
 LABEL maintainer="Wes Lambert, @therealwlambert"
-ENV VERSION="0.5.0-1"
+ENV VERSION="0.5.1"
 COPY ./entrypoint .
 RUN chmod +x entrypoint && \
     apt-get update && \
@@ -11,10 +11,10 @@ RUN chmod +x entrypoint && \
     mkdir -p /opt/velociraptor && \
     for i in linux mac windows; do mkdir -p /opt/velociraptor/$i; done && \
     # Get Velox binaries
-    wget -O /opt/velociraptor/linux/velociraptor https://github.com/Velocidex/velociraptor/releases/download/v$VERSION/velociraptor-v$VERSION-linux-amd64 && \
+    wget -O /opt/velociraptor/linux/velociraptor https://github.com/Velocidex/velociraptor/releases/download/v$VERSION/velociraptor-v$VERSION-1-linux-amd64 && \
     wget -O /opt/velociraptor/mac/velociraptor_client https://github.com/Velocidex/velociraptor/releases/download/v$VERSION/velociraptor-v$VERSION-darwin-amd64 && \
-    wget -O /opt/velociraptor/windows/velociraptor_client.exe https://github.com/Velocidex/velociraptor/releases/download/v$VERSION/velociraptor-v$VERSION-windows-amd64.exe && \
-    wget -O /opt/velociraptor/windows/velociraptor_client.msi https://github.com/Velocidex/velociraptor/releases/download/v$VERSION/velociraptor-v$VERSION-windows-amd64.msi && \
+    wget -O /opt/velociraptor/windows/velociraptor_client.exe https://github.com/Velocidex/velociraptor/releases/download/v$VERSION/velociraptor-v$VERSION-1-windows-amd64.exe && \
+    wget -O /opt/velociraptor/windows/velociraptor_client.msi https://github.com/Velocidex/velociraptor/releases/download/v$VERSION/velociraptor-v$VERSION-1-windows-amd64.msi && \
     # Clean up 
     apt-get remove -y --purge wget && \
     apt-get clean
