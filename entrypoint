@@ -10,9 +10,9 @@ CLIENT_DIR="/velociraptor/clients"
 
 # Move binaries into place
 cp /opt/velociraptor/linux/velociraptor . && chmod +x velociraptor
-mkdir -p $CLIENT_DIR/linux && cp /opt/velociraptor/linux/velociraptor /velociraptor/clients/linux/velociraptor_client
-mkdir -p $CLIENT_DIR/mac && mv /opt/velociraptor/mac/velociraptor_client /velociraptor/clients/mac/velociraptor_client
-mkdir -p $CLIENT_DIR/windows && mv /opt/velociraptor/windows/velociraptor_client* /velociraptor/clients/windows/
+mkdir -p $CLIENT_DIR/linux && rsync -a /opt/velociraptor/linux/velociraptor /velociraptor/clients/linux/velociraptor_client
+mkdir -p $CLIENT_DIR/mac && rsync -a /opt/velociraptor/mac/velociraptor_client /velociraptor/clients/mac/velociraptor_client
+mkdir -p $CLIENT_DIR/windows && rsync -a /opt/velociraptor/windows/velociraptor_client* /velociraptor/clients/windows/
 
 # If no existing server config, set it up
 if [ ! -f server.config.yaml ]; then

@@ -1,12 +1,12 @@
 FROM ubuntu:18.04
-LABEL version="Velociraptor v0.5.1"
+LABEL version="Velociraptor v0.6.1"
 LABEL description="Velociraptor server in a Docker container"
 LABEL maintainer="Wes Lambert, @therealwlambert"
-ENV VERSION="0.5.1"
+ENV VERSION="0.6.1"
 COPY ./entrypoint .
 RUN chmod +x entrypoint && \
     apt-get update && \
-    apt-get install -y curl wget jq && \
+    apt-get install -y curl wget jq rsync && \
     # Create dirs for Velo binaries
     mkdir -p /opt/velociraptor && \
     for i in linux mac windows; do mkdir -p /opt/velociraptor/$i; done && \
