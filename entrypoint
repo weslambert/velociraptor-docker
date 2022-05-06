@@ -2,7 +2,6 @@
 set -e
 BIND_ADDRESS="0.0.0.0"
 PUBLIC_PATH="public"
-LOG_DIR="."
 CLIENT_DIR="/velociraptor/clients"
 
 # Move binaries into place
