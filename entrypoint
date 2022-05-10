@@ -3,7 +3,6 @@ set -e
 BIND_ADDRESS="0.0.0.0"
 PUBLIC_PATH="public"
 LOG_DIR="."
-SERVER_URL="https://VelociraptorServer:8000/"
 DATASTORE_LOCATION="./"
 FILESTORE_DIRECTORY="./"
 CLIENT_DIR="/velociraptor/clients"
