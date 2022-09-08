@@ -3,9 +3,6 @@ services:
   velociraptor:
     container_name: velociraptor
     #image: wlambert/velociraptor
-    build:
-      context: ./
-      dockerfile: Dockerfile
     volumes:
       - ./velociraptor:/velociraptor/:rw
     environment:
@@ -25,9 +22,6 @@ services:
   velociraptor_minion:
     container_name: velociraptor_minion
     #image: wlambert/velociraptor
-    build:
-      context: ./
-      dockerfile: Dockerfile
     volumes:
       - ./velociraptor:/velociraptor/:rw
     environment:
