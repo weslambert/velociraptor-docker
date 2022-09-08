@@ -1,4 +1,4 @@
-version: '2'
+version: '3.3'
 services:
   velociraptor:
     container_name: velociraptor
@@ -18,4 +18,29 @@ services:
       - "8000:8000"
       - "8001:8001"
       - "8889:8889"
-    restart: unless-stopped
+    networks:
+      - velo
+
+  velociraptor_minion:
+    container_name: velociraptor
+    #image: wlambert/velociraptor
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./velociraptor:/velociraptor/:rw
+    environment:
+      - VELOX_USER=${VELOX_USER}
+      - VELOX_PASSWORD=${VELOX_PASSWORD}
+      - VELOX_ROLE=${VELOX_ROLE}
+      - VELOX_SERVER_URL=${VELOX_SERVER_URL}
+      - VELOX_FRONTEND_HOSTNAME=${VELOX_FRONTEND_HOSTNAME}
+      - VELOX_MODE=minion
+      - VELOX_API_HOSTNAME=velociraptor
+    ports:
+      - "8000:8000"
+    networks:
+      - velo
+
+networks:
+  velo:

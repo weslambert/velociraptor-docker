@@ -7,6 +7,11 @@ DATASTORE_LOCATION="./"
 FILESTORE_DIRECTORY="./"
 CLIENT_DIR="/velociraptor/clients"
 
+# Set default values
+if [[ $VELOX_MODE != "minion" ]]; then VELOX_MODE="master"; fi
+if [[ $VELOX_API_PORT == "" ]]; then VELOX_API_PORT=8001; fi
+if [[ $VELOX_API_CONNECT_PORT == "" ]]; then VELOX_API_CONNECT_PORT=$VELOX_API_PORT; fi
+
 # Move binaries into place
 cp /opt/velociraptor/linux/velociraptor . && chmod +x velociraptor
 mkdir -p $CLIENT_DIR/linux && rsync -a /opt/velociraptor/linux/velociraptor /velociraptor/clients/linux/velociraptor_client
@@ -14,20 +19,34 @@ mkdir -p $CLIENT_DIR/mac && rsync -a /opt/velociraptor/mac/velociraptor_client /
 mkdir -p $CLIENT_DIR/windows && rsync -a /opt/velociraptor/windows/velociraptor_client* /velociraptor/clients/windows/
 
 # If no existing server config, set it up
-if [ ! -f server.config.yaml ]; then
-	./velociraptor config generate > server.config.yaml --merge '{"Frontend":{"public_path":"'$PUBLIC_PATH'", "hostname":"'$VELOX_FRONTEND_HOSTNAME'"},"API":{"bind_address":"'$BIND_ADDRESS'"},"GUI":{"bind_address":"'$BIND_ADDRESS'"},"Monitoring":{"bind_address":"'$BIND_ADDRESS'"},"Logging":{"output_directory":"'$LOG_DIR'","separate_logs_per_component":true},"Client":{"server_urls":["'$VELOX_SERVER_URL'"],"use_self_signed_ssl":true}, "Datastore":{"location":"'$DATASTORE_LOCATION'", "filestore_directory":"'$FILESTORE_DIRECTORY'"}}'
-        #sed -i "s#https://localhost:8000/#$VELOX_CLIENT_URL#" server.config.yaml
-	sed -i 's#/tmp/velociraptor#.#'g server.config.yaml
-	./velociraptor --config server.config.yaml user add $VELOX_USER $VELOX_PASSWORD --role $VELOX_ROLE
+if [[ $VELOX_MODE == "master" ]]; then
+	if [ ! -f server.config.yaml ]; then
+		./velociraptor config generate > server.config.yaml --merge '{"Frontend":{"public_path":"'$PUBLIC_PATH'", "hostname":"'$VELOX_FRONTEND_HOSTNAME'"},"API":{"bind_address":"'$BIND_ADDRESS'","bind_port":'$VELOX_API_PORT',"hostname":"'$VELOX_API_HOSTNAME'"},"GUI":{"bind_address":"'$BIND_ADDRESS'"},"Monitoring":{"bind_address":"'$BIND_ADDRESS'"},"Logging":{"output_directory":"'$LOG_DIR'","separate_logs_per_component":true},"Client":{"server_urls":["'$VELOX_SERVER_URL'"],"use_self_signed_ssl":true}, "Datastore":{"location":"'$DATASTORE_LOCATION'", "filestore_directory":"'$FILESTORE_DIRECTORY'"}}'
+			#sed -i "s#https://localhost:8000/#$VELOX_CLIENT_URL#" server.config.yaml
+		sed -i 's#/tmp/velociraptor#.#'g server.config.yaml
+		./velociraptor --config server.config.yaml user add $VELOX_USER $VELOX_PASSWORD --role $VELOX_ROLE
+	fi
+
+	# Re-generate client config in case server config changed
+	./velociraptor --config server.config.yaml config client > client.config.yaml
+	
+	# Repack clients
+	./velociraptor config repack --exe clients/linux/velociraptor_client client.config.yaml clients/linux/velociraptor_client_repacked
+	./velociraptor config repack --exe clients/mac/velociraptor_client client.config.yaml clients/mac/velociraptor_client_repacked
+	./velociraptor config repack --exe clients/windows/velociraptor_client.exe client.config.yaml clients/windows/velociraptor_client_repacked.exe
 fi
 
-# Re-generate client config in case server config changed
-./velociraptor --config server.config.yaml config client > client.config.yaml
+# Let minions sleep until master is up and running
+if [[ $VELOX_MODE == "minion" ]]; then
+    until curl "$VELOX_SERVER_URL" >/dev/null 2>&1; do
+        >&2 echo "Master is unavailable - sleeping"
+        sleep 1
+    done
+fi
 
-# Repack clients
-./velociraptor config repack --exe clients/linux/velociraptor_client client.config.yaml clients/linux/velociraptor_client_repacked
-./velociraptor config repack --exe clients/mac/velociraptor_client client.config.yaml clients/mac/velociraptor_client_repacked
-./velociraptor config repack --exe clients/windows/velociraptor_client.exe client.config.yaml clients/windows/velociraptor_client_repacked.exe
-
-# Start Velocoraptor
-./velociraptor --config server.config.yaml frontend -v
+# Start Velociraptor
+if [[ $VELOX_MODE == "master" ]]; then
+    ./velociraptor --config server.config.yaml frontend
+elif [[ $VELOX_MODE == "minion" ]]; then
+    ./velociraptor --config server.config.yaml frontend --minion --config.api-bind-port=$VELOX_API_CONNECT_PORT
+fi
