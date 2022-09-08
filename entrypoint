@@ -20,20 +20,39 @@ mkdir -p $CLIENT_DIR/windows && rsync -a /opt/velociraptor/windows/velociraptor_
 
 # If no existing server config, set it up
 if [[ $VELOX_MODE == "master" ]]; then
-        if [ ! -f server.config.yaml ]; then
-                ./velociraptor config generate > server.config.yaml --merge '{"Frontend":{"public_path":"'$PUBLIC_PATH'", "hostname":"'$VELOX_FRONTEND_HOSTNAME'"},"API":{"bind_address":"'$BIND_ADDRESS'","bind_port":'$VELOX_API_PORT',"hostname":"'$VELOX_API_HOSTNAME'"},"GUI":{"bind_address":"'$BIND_ADDRESS'"},"Monitoring":{"bind_address":"'$BIND_ADDRESS'"},"Logging":{"output_directory":"'$LOG_DIR'","separate_logs_per_component":true},"Client":{"server_urls":["'$VELOX_SERVER_URL'"],"use_self_signed_ssl":true}, "Datastore":{"location":"'$DATASTORE_LOCATION'", "filestore_directory":"'$FILESTORE_DIRECTORY'"}}'
-                        #sed -i "s#https://localhost:8000/#$VELOX_CLIENT_URL#" server.config.yaml
-                sed -i 's#/tmp/velociraptor#.#'g server.config.yaml
-                ./velociraptor --config server.config.yaml user add $VELOX_USER $VELOX_PASSWORD --role $VELOX_ROLE
-        fi
+	# Generate server config on first start
+	if [ ! -f server.config.yaml ]; then
+		./velociraptor config generate > server.config.yaml --merge '{"Frontend":{"public_path":"'$PUBLIC_PATH'", "hostname":"'$VELOX_FRONTEND_HOSTNAME'"},"API":{"bind_address":"'$BIND_ADDRESS'","bind_port":'$VELOX_API_PORT',"hostname":"'$VELOX_API_HOSTNAME'"},"GUI":{"bind_address":"'$BIND_ADDRESS'"},"Monitoring":{"bind_address":"'$BIND_ADDRESS'"},"Logging":{"output_directory":"'$LOG_DIR'","separate_logs_per_component":true},"Client":{"server_urls":["'$VELOX_SERVER_URL'"],"use_self_signed_ssl":true}, "Datastore":{"location":"'$DATASTORE_LOCATION'", "filestore_directory":"'$FILESTORE_DIRECTORY'"}}'
+		#sed -i "s#https://localhost:8000/#$VELOX_CLIENT_URL#" server.config.yaml
+		sed -i 's#/tmp/velociraptor#.#'g server.config.yaml
 
-        # Re-generate client config in case server config changed
-        ./velociraptor --config server.config.yaml config client > client.config.yaml
+		# Create local user
+		if [[ $VELOX_USER != "" ]]; then
+			./velociraptor --config server.config.yaml user add $VELOX_USER $VELOX_PASSWORD --role $VELOX_ROLE
+		fi
+		
+		# Create initial OIDC users - comma seperated list of e-mail addresses
+		if [[ $VELOX_OIDC_USER != "" ]]; then
+			IFS=',' read -r -a array <<< $VELOX_OIDC_USER
+			for element in "${array[@]}"
+			do
+				./velociraptor --config server.config.yaml user add $element --role $VELOX_OIDC_ROLE
+			done
+		fi
+	fi
+	# Re-generate server config in case it changed
+	./velociraptor config show --config server.config.yaml > server_.config.yaml --merge '{"Frontend":{"public_path":"'$PUBLIC_PATH'", "hostname":"'$VELOX_FRONTEND_HOSTNAME'"},"API":{"bind_address":"'$BIND_ADDRESS'","bind_port":'$VELOX_API_PORT',"hostname":"'$VELOX_API_HOSTNAME'"},"GUI":{"bind_address":"'$BIND_ADDRESS'"},"Monitoring":{"bind_address":"'$BIND_ADDRESS'"},"Logging":{"output_directory":"'$LOG_DIR'","separate_logs_per_component":true},"Client":{"server_urls":["'$VELOX_SERVER_URL'"],"use_self_signed_ssl":true}, "Datastore":{"location":"'$DATASTORE_LOCATION'", "filestore_directory":"'$FILESTORE_DIRECTORY'"}}'
+	# Set re-generated config to be the active one
+	# must be done in two steps because the file would be overwritten before its being read otherwise
+	mv server_.config.yaml server.config.yaml
 
-        # Repack clients
-        ./velociraptor config repack --exe clients/linux/velociraptor_client client.config.yaml clients/linux/velociraptor_client_repacked
-        ./velociraptor config repack --exe clients/mac/velociraptor_client client.config.yaml clients/mac/velociraptor_client_repacked
-        ./velociraptor config repack --exe clients/windows/velociraptor_client.exe client.config.yaml clients/windows/velociraptor_client_repacked.exe
+	# Re-generate client config in case server config changed
+	./velociraptor --config server.config.yaml config client > client.config.yaml
+
+	# Repack clients
+	./velociraptor config repack --exe clients/linux/velociraptor_client client.config.yaml clients/linux/velociraptor_client_repacked
+	./velociraptor config repack --exe clients/mac/velociraptor_client client.config.yaml clients/mac/velociraptor_client_repacked
+	./velociraptor config repack --exe clients/windows/velociraptor_client.exe client.config.yaml clients/windows/velociraptor_client_repacked.exe
 fi
 
 # Start Velociraptor
