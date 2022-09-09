@@ -1,9 +1,9 @@
 #!/bin/bash
 
 function find_tag(){
-    if [ $search == "latest" ]; then
+    if [[ $search == "latest" ]]; then
         echo $(echo $releases | jq ".[] | select(.prerelease == false) | .tag_name" -r | head -n1)
-    elif [ $search == "latest-pre" ]; then
+    elif [[ $search == "latest-pre" ]]; then
         echo $(echo $releases | jq ".[0].tag_name" -r)
     else
         echo $(echo $releases | jq ".[] | select(.tag_name == \"$search\") | .tag_name" -r)
@@ -11,9 +11,9 @@ function find_tag(){
 }
 
 function find_url(){
-    if [ $search == "latest" ]; then
+    if [[ $search == "latest" ]]; then
         echo $(echo $releases | jq ".[] | select(.prerelease == false) | .url" -r | head -n1)
-    elif [ $search == "latest-pre" ]; then
+    elif [[ $search == "latest-pre" ]]; then
         echo $(echo $releases | jq ".[0].url" -r)
     else
         echo $(echo $releases | jq ".[] | select(.tag_name == \"$search\") | .url" -r)
@@ -102,7 +102,7 @@ search=latest
 GIT_PUSH_IMAGE=velociraptor # default name of local builds
 
 # read parameters
-TEMP=`getopt -o htui --long help,push-token:,push-user:,push-image: -- "$@"`
+TEMP=`getopt -o ht:u:i: --long help,push-token:,push-user:,push-image: -- "$@"`
 eval set -- "$TEMP"
 
 while true ; do
@@ -127,7 +127,7 @@ while true ; do
             ;;
         --) 
             shift
-            search=$1
+            search=${1:-latest}
             shift
             ;;
         *)
@@ -144,9 +144,9 @@ validate
 build
 
 skip=0
-if [[ GIT_PUSH_TOKEN == "" ]]; then >&2 echo "Push token not specified."; skip=1; fi
-if [[ GIT_PUSH_USER  == "" ]]; then >&2 echo "Push user not specified."; skip=1; fi
-if [[ GIT_PUSH_IMAGE == "" ]]; then >&2 echo "Push image not specified."; skip=1; fi
+if [[ $GIT_PUSH_TOKEN == "" ]]; then >&2 echo "Push token not specified."; skip=1; fi
+if [[ $GIT_PUSH_USER  == "" ]]; then >&2 echo "Push user not specified."; skip=1; fi
+if [[ $GIT_PUSH_IMAGE == "" ]]; then >&2 echo "Push image not specified."; skip=1; fi
 if [ $skip = 1 ]; then >&2 echo "Skipping push."; exit 0; fi
 
 login
