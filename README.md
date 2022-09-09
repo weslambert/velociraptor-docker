@@ -7,6 +7,7 @@ Run [Velocidex Velociraptor](https://github.com/Velocidex/velociraptor) server w
 - `git clone https://github.com/weslambert/velociraptor-docker`
 - `cd velociraptor-docker`
 - Change credential values in `.env` as desired
+- Run `sudo bash build.sh` to build the latest velociraptor version locally
 - `docker-compose up` (or `docker-compose up -d` for detached)
 - Access the Velociraptor GUI via https://\<hostip\>:8889 
   - Default u/p is `admin/admin`
