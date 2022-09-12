@@ -12,16 +12,16 @@ if [[ $VELOX_MODE != "minion" ]]; then VELOX_MODE="master"; fi
 if [[ $VELOX_API_PORT == "" ]]; then VELOX_API_PORT=8001; fi
 if [[ $VELOX_API_CONNECT_PORT == "" ]]; then VELOX_API_CONNECT_PORT=$VELOX_API_PORT; fi
 
-# Move binaries into place
-if [ ! -f velociraptor ]; then
-    cp /opt/velociraptor/linux/velociraptor . && chmod +x velociraptor
-fi
-mkdir -p $CLIENT_DIR/linux && rsync -a /opt/velociraptor/linux/velociraptor /velociraptor/clients/linux/velociraptor_client
-mkdir -p $CLIENT_DIR/mac && rsync -a /opt/velociraptor/mac/velociraptor_client /velociraptor/clients/mac/velociraptor_client
-mkdir -p $CLIENT_DIR/windows && rsync -a /opt/velociraptor/windows/velociraptor_client* /velociraptor/clients/windows/
 
 # If no existing server config, set it up
 if [[ $VELOX_MODE == "master" ]]; then
+
+	# Move binaries into place
+	cp /opt/velociraptor/linux/velociraptor . && chmod +x velociraptor
+	mkdir -p $CLIENT_DIR/linux && rsync -a /opt/velociraptor/linux/velociraptor /velociraptor/clients/linux/velociraptor_client
+	mkdir -p $CLIENT_DIR/mac && rsync -a /opt/velociraptor/mac/velociraptor_client /velociraptor/clients/mac/velociraptor_client
+	mkdir -p $CLIENT_DIR/windows && rsync -a /opt/velociraptor/windows/velociraptor_client* /velociraptor/clients/windows/
+
 	# Generate server config on first start
 	if [ ! -f server.config.yaml ]; then
 		./velociraptor config generate > server.config.yaml --merge '{"Frontend":{"public_path":"'$PUBLIC_PATH'", "hostname":"'$VELOX_FRONTEND_HOSTNAME'"},"API":{"bind_address":"'$BIND_ADDRESS'","bind_port":'$VELOX_API_PORT',"hostname":"'$VELOX_API_HOSTNAME'"},"GUI":{"bind_address":"'$BIND_ADDRESS'"},"Monitoring":{"bind_address":"'$BIND_ADDRESS'"},"Logging":{"output_directory":"'$LOG_DIR'","separate_logs_per_component":true},"Client":{"server_urls":["'$VELOX_SERVER_URL'"],"use_self_signed_ssl":true}, "Datastore":{"location":"'$DATASTORE_LOCATION'", "filestore_directory":"'$FILESTORE_DIRECTORY'"}}'
