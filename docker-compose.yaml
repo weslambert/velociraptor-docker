@@ -22,6 +22,8 @@ services:
   velociraptor_minion:
     container_name: velociraptor_minion
     image: velociraptor:latest
+    profiles:
+      - minion
     volumes:
       - ./velociraptor:/velociraptor/:rw
     environment:
