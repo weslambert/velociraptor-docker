@@ -12,7 +12,7 @@ Run [Velocidex Velociraptor](https://github.com/Velocidex/velociraptor) server w
   - Default u/p is `admin/admin`
   - This can be changed by running: 
   
-  `docker exec -it velocraptor ./velociraptor --config server.config.yaml user add user1 user1 --role administrator`
+  `docker exec -it velociraptor ./velociraptor --config server.config.yaml user add user1 user1 --role administrator`
 
 #### Notes:
 
