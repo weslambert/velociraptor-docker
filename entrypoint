@@ -2,7 +2,6 @@
 set -e
 BIND_ADDRESS="0.0.0.0"
 PUBLIC_PATH="public"
-LOG_DIR="."
 DATASTORE_LOCATION="./"
 FILESTORE_DIRECTORY="./"
 CLIENT_DIR="/velociraptor/clients"
@@ -11,6 +10,7 @@ CLIENT_DIR="/velociraptor/clients"
 if [[ $VELOX_MODE != "minion" ]]; then VELOX_MODE="master"; fi
 if [[ $VELOX_API_PORT == "" ]]; then VELOX_API_PORT=8001; fi
 if [[ $VELOX_API_CONNECT_PORT == "" ]]; then VELOX_API_CONNECT_PORT=$VELOX_API_PORT; fi
+if [[ $VELOX_LOG_DIR == "" ]]; then VELOX_LOG_DIR="/velociraptor/logs"; fi
 
 
 # If no existing server config, set it up
@@ -23,9 +23,8 @@ if [[ $VELOX_MODE == "master" ]]; then
 
 	# Generate server config on first start
 	if [ ! -f server.config.yaml ]; then
-		velociraptor config generate > server.config.yaml --merge '{"Frontend":{"public_path":"'$PUBLIC_PATH'", "hostname":"'$VELOX_FRONTEND_HOSTNAME'"},"API":{"bind_address":"'$BIND_ADDRESS'","bind_port":'$VELOX_API_PORT',"hostname":"'$VELOX_API_HOSTNAME'"},"GUI":{"bind_address":"'$BIND_ADDRESS'"},"Monitoring":{"bind_address":"'$BIND_ADDRESS'"},"Logging":{"output_directory":"'$LOG_DIR'","separate_logs_per_component":true},"Client":{"server_urls":["'$VELOX_SERVER_URL'"],"use_self_signed_ssl":true}, "Datastore":{"location":"'$DATASTORE_LOCATION'", "filestore_directory":"'$FILESTORE_DIRECTORY'"}}'
-		#sed -i "s#https://localhost:8000/#$VELOX_CLIENT_URL#" server.config.yaml
-		sed -i 's#/tmp/velociraptor#.#'g server.config.yaml
+		# Datastore is needed for user creation
+		velociraptor config generate > server.config.yaml --merge '{"Datastore":{"location":"'$DATASTORE_LOCATION'", "filestore_directory":"'$FILESTORE_DIRECTORY'"},"Logging":{"output_directory":"'$VELOX_LOG_DIR'","separate_logs_per_component":true}}'
 
 		# Create local user
 		if [[ $VELOX_USER != "" ]]; then
@@ -42,7 +41,7 @@ if [[ $VELOX_MODE == "master" ]]; then
 		fi
 	fi
 	# Re-generate server config in case it changed
-	velociraptor config show --config server.config.yaml > server_.config.yaml --merge '{"Frontend":{"public_path":"'$PUBLIC_PATH'", "hostname":"'$VELOX_FRONTEND_HOSTNAME'"},"API":{"bind_address":"'$BIND_ADDRESS'","bind_port":'$VELOX_API_PORT',"hostname":"'$VELOX_API_HOSTNAME'"},"GUI":{"bind_address":"'$BIND_ADDRESS'"},"Monitoring":{"bind_address":"'$BIND_ADDRESS'"},"Logging":{"output_directory":"'$LOG_DIR'","separate_logs_per_component":true},"Client":{"server_urls":["'$VELOX_SERVER_URL'"],"use_self_signed_ssl":true}, "Datastore":{"location":"'$DATASTORE_LOCATION'", "filestore_directory":"'$FILESTORE_DIRECTORY'"}}'
+	velociraptor config show --config server.config.yaml > server_.config.yaml --merge '{"Frontend":{"public_path":"'$PUBLIC_PATH'", "hostname":"'$VELOX_FRONTEND_HOSTNAME'"},"API":{"bind_address":"'$BIND_ADDRESS'","bind_port":'$VELOX_API_PORT',"hostname":"'$VELOX_API_HOSTNAME'"},"GUI":{"bind_address":"'$BIND_ADDRESS'"},"Monitoring":{"bind_address":"'$BIND_ADDRESS'"},"Logging":{"output_directory":"'$VELOX_LOG_DIR'","separate_logs_per_component":true},"Client":{"server_urls":["'$VELOX_SERVER_URL'"],"use_self_signed_ssl":true}, "Datastore":{"location":"'$DATASTORE_LOCATION'", "filestore_directory":"'$FILESTORE_DIRECTORY'"}}'
 	# Set re-generated config to be the active one
 	# must be done in two steps because the file would be overwritten before its being read otherwise
 	mv server_.config.yaml server.config.yaml
