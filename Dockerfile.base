@@ -23,6 +23,8 @@ RUN apt-get update && \
     # Clean up 
     apt-get remove -y --purge curl wget jq && \
     apt-get clean
+RUN cp /opt/velociraptor/linux/velociraptor /usr/bin/ && \
+    chmod +x /usr/bin/velociraptor
 COPY ./entrypoint .
 RUN chmod +x entrypoint
 WORKDIR /velociraptor 
