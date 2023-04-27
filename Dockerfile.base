@@ -21,7 +21,8 @@ RUN apt-get update && \
     wget -O /opt/velociraptor/windows/velociraptor_client.exe "$WINDOWS_EXE" && \
     wget -O /opt/velociraptor/windows/velociraptor_client.msi "$WINDOWS_MSI" && \
     # Clean up 
-    apt-get remove -y --purge curl wget jq && \
+    # needs curl for minions checking on master
+    apt-get remove -y --purge wget jq && \
     apt-get clean
 RUN cp /opt/velociraptor/linux/velociraptor /usr/bin/ && \
     chmod +x /usr/bin/velociraptor

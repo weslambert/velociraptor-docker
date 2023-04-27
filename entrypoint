@@ -60,5 +60,8 @@ fi
 if [[ $VELOX_MODE == "master" ]]; then
     velociraptor --config server.config.yaml frontend
 elif [[ $VELOX_MODE == "minion" ]]; then
+	# wait for master to be up
+	while [ $(curl -ksw "%{http_code}\n" "https://velociraptor:8889" -o /dev/null) -ne 302 ]; do sleep 5; echo "Waiting for master to be up..."; done
+
     velociraptor --config server.config.yaml frontend --minion --config.api-bind-port=$VELOX_API_CONNECT_PORT --config.frontend-bind-port=$VELOX_SERVER_PORT
 fi
