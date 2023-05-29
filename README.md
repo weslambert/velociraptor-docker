@@ -24,3 +24,7 @@ Once started, edit `server.config.yaml` in `/velociraptor`, then run `docker-com
 To pull only the Docker image:
 
 `docker pull wlambert/velociraptor`
+
+To pull a specific version of the Docker image:
+
+`docker pull wlambert/velociraptor:0.6.8-2`
