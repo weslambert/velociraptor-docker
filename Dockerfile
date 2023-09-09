@@ -19,7 +19,7 @@ RUN chmod +x entrypoint && \
     wget -O /opt/velociraptor/windows/velociraptor_client.exe "$WINDOWS_EXE" && \
     wget -O /opt/velociraptor/windows/velociraptor_client.msi "$WINDOWS_MSI" && \
     # Clean up 
-    apt-get remove -y --purge curl wget jq && \
+    apt-get remove -y --purge wget && \
     apt-get clean
 WORKDIR /velociraptor 
 CMD ["/entrypoint"]

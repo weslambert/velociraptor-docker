@@ -30,5 +30,15 @@ fi
 ./velociraptor config repack --exe clients/windows/velociraptor_client.exe client.config.yaml clients/windows/velociraptor_client_repacked.exe
 ./velociraptor config repack --msi clients/windows/velociraptor_client.msi client.config.yaml clients/windows/velociraptor_client_repacked.msi
 
+# Check Server Certificate Status, Re-generate if it's expiring in 24-hours or less
+if true | ./velociraptor --config server.config.yaml config show --json | jq -r .Frontend.certificate | openssl x509 -text -enddate -noout -checkend 86400 >/dev/null; then
+  echo "Skipping renewal, certificate is not expired"
+else
+  echo "Certificate is expired, rotating certificate."
+  ./velociraptor --config ./server.config.yaml config rotate_key > /tmp/server.config.yaml
+  cp ./server.config.yaml ./server.config.yaml.bak
+  mv /tmp/server.config.yaml /velociraptor/.
+fi
+
 # Start Velocoraptor
 ./velociraptor --config server.config.yaml frontend -v
