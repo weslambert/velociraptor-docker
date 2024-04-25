@@ -21,6 +21,16 @@ if [ ! -f server.config.yaml ]; then
 	./velociraptor --config server.config.yaml user add $VELOX_USER $VELOX_PASSWORD --role $VELOX_ROLE
 fi
 
+# Check Server Certificate Status, Re-generate if it's expiring in 24-hours or less
+if true | ./velociraptor --config server.config.yaml config show --json | jq -r .Frontend.certificate | openssl x509 -text -enddate -noout -checkend 86400 >/dev/null; then
+  echo "Skipping renewal, certificate is not expired"
+else
+  echo "Certificate is expired, rotating certificate."
+  ./velociraptor --config ./server.config.yaml config rotate_key > /tmp/server.config.yaml
+  cp ./server.config.yaml ./server.config.yaml.bak
+  mv /tmp/server.config.yaml /velociraptor/.
+fi
+
 # Re-generate client config in case server config changed
 ./velociraptor --config server.config.yaml config client > client.config.yaml
 
