@@ -36,6 +36,8 @@ fi
 
 # Repack clients
 ./velociraptor config repack --exe clients/linux/velociraptor_client client.config.yaml clients/linux/velociraptor_client_repacked
+./velociraptor --config client.config.yaml debian client --output clients/linux/velociraptor_client_repacked.deb
+./velociraptor --config client.config.yaml rpm client --output clients/linux/velociraptor_client_repacked.rpm
 ./velociraptor config repack --exe clients/mac/velociraptor_client client.config.yaml clients/mac/velociraptor_client_repacked
 ./velociraptor config repack --exe clients/windows/velociraptor_client.exe client.config.yaml clients/windows/velociraptor_client_repacked.exe
 ./velociraptor config repack --msi clients/windows/velociraptor_client.msi client.config.yaml clients/windows/velociraptor_client_repacked.msi
