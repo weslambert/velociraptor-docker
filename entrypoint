@@ -6,6 +6,7 @@ LOG_DIR="."
 DATASTORE_LOCATION="./"
 FILESTORE_DIRECTORY="./"
 CLIENT_DIR="/velociraptor/clients"
+ARTIFACTS_DIR="/velociraptor/artifacts"
 
 # Move binaries into place
 cp /opt/velociraptor/linux/velociraptor . && chmod +x velociraptor
@@ -43,4 +44,4 @@ fi
 ./velociraptor config repack --msi clients/windows/velociraptor_client.msi client.config.yaml clients/windows/velociraptor_client_repacked.msi
 
 # Start Velocoraptor
-./velociraptor --config server.config.yaml frontend -v
+./velociraptor --config server.config.yaml frontend --definitions=$ARTIFACTS_DIR -v
