@@ -24,7 +24,7 @@ if [ ! -f server.config.yaml ]; then
     awk '/^client_private_key: \|/ { flag=1; next } /^[^ ]/ { flag=0 } flag { sub(/^  /, ""); print }' /velociraptor/velociraptor-mtls.yaml > /velociraptor/client_private_key.pem
     env "CONFIG.CLIENT_CRYPTO_CLIENT_CERTIFICATE=$(</velociraptor/client_cert.pem)" "CONFIG.CLIENT_CRYPTO_CLIENT_CERTIFICATE_PRIVATE_KEY=$(</velociraptor/client_private_key.pem)" ./velociraptor --config server.config.yaml config show > /velociraptor/server.config.temp
     mv /velociraptor/server.config.temp /velociraptor/server.config.yaml
-    #sed -i "s#https://localhost:8000/#$VELOX_CLIENT_URL#" server.config.yaml
+    sed -i '/- https:\/\/localhost:8000/d' server.config.yaml
     sed -i 's#/tmp/velociraptor#.#'g server.config.yaml
     ./velociraptor --config server.config.yaml user add $VELOX_USER $VELOX_PASSWORD --role $VELOX_ROLE
 fi
