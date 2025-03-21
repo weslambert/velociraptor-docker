@@ -26,6 +26,7 @@ if [ ! -f server.config.yaml ]; then
     mv /velociraptor/server.config.temp /velociraptor/server.config.yaml
     #sed -i "s#https://localhost:8000/#$VELOX_CLIENT_URL#" server.config.yaml
     sed -i 's#/tmp/velociraptor#.#'g server.config.yaml
+    ./velociraptor --config server.config.yaml user add $VELOX_USER $VELOX_PASSWORD --role $VELOX_ROLE
 fi
 
 # Check Server Certificate Status, Re-generate if it's expiring in 24-hours or less
