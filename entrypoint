@@ -16,6 +16,8 @@ mkdir -p $CLIENT_DIR/windows && rsync -a /opt/velociraptor/windows/velociraptor_
 # If no existing server config, set it up
 if [ ! -f server.config.yaml ]; then
     ./velociraptor config generate > server.config.yaml --merge '{"Frontend":{"public_path":"'$PUBLIC_PATH'", "hostname":"'$VELOX_FRONTEND_HOSTNAME'", "require_client_certificates":true, "artifact_definitions_directory":"/tmp/artifacts/", "initial_server_artifacts":["Server.Import.ArtifactExchange","Server.Import.Rapid7Labs","Server.Import.RegistryHunter","Server.Import.DetectRaptor"]},"API":{"bind_address":"'$BIND_ADDRESS'"},"GUI":{"bind_address":"'$BIND_ADDRESS'"},"Monitoring":{"bind_address":"'$BIND_ADDRESS'"},"Logging":{"output_directory":"'$LOG_DIR'","separate_logs_per_component":true}, "Client":{"use_self_signed_ssl":true, "ws_ping_wait_sec": 30, "concurrency": 1}, "Datastore":{"location":"'$DATASTORE_LOCATION'", "filestore_directory":"'$FILESTORE_DIRECTORY'", "min_allowed_file_space_mb":5000}, "defaults":{"notebook_cell_timeout_min":15, "notebook_number_of_local_workers":10, "hunt_expiry_hours":336, "max_in_memory_group_by": 60000, "notebook_versions": 20}}'
+    # create account
+    ./velociraptor --config server.config.yaml user add $VELOX_USER $VELOX_PASSWORD --role $VELOX_ROLE
     # do mtls stuff
     ./velociraptor --config server.config.yaml config api_client --name "Client" /velociraptor/velociraptor-mtls.yaml
     sleep 1
@@ -26,7 +28,6 @@ if [ ! -f server.config.yaml ]; then
     mv /velociraptor/server.config.temp /velociraptor/server.config.yaml
     sed -i '/- https:\/\/localhost:8000/d' server.config.yaml
     sed -i 's#/tmp/velociraptor#.#'g server.config.yaml
-    ./velociraptor --config server.config.yaml user add $VELOX_USER $VELOX_PASSWORD --role $VELOX_ROLE
 fi
 
 # Check Server Certificate Status, Re-generate if it's expiring in 24-hours or less
