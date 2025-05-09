@@ -1,5 +1,5 @@
 FROM ubuntu:22.04
-LABEL version="Velociraptor v0.73.4"
+LABEL version="Velociraptor v0.74.2"
 LABEL description="Velociraptor server in a Docker container"
 LABEL maintainer="Wes Lambert, @therealwlambert"
 COPY ./entrypoint .
@@ -9,11 +9,14 @@ RUN chmod +x entrypoint && \
     # Create dirs for Velo binaries
     mkdir -p /opt/velociraptor && \
     for i in linux mac windows; do mkdir -p /opt/velociraptor/$i; done && \
-    # Get Velox binaries
-    WINDOWS_EXE=$(curl -s https://api.github.com/repos/velocidex/velociraptor/releases/latest | jq -r '[.assets | sort_by(.created_at) | reverse | .[] | .browser_download_url | select(test("windows-amd64.exe$"))][0]') && \
-    WINDOWS_MSI=$(curl -s https://api.github.com/repos/velocidex/velociraptor/releases/latest | jq -r '[.assets | sort_by(.created_at) | reverse | .[] | .browser_download_url | select(test("windows-amd64.msi$"))][0]') && \
-    LINUX_BIN=$(curl -s https://api.github.com/repos/velocidex/velociraptor/releases/latest | jq -r '[.assets | sort_by(.created_at) | reverse | .[] | .browser_download_url | select(test("linux-amd64$"))][0]') && \
-    MAC_BIN=$(curl -s https://api.github.com/repos/velocidex/velociraptor/releases/latest | jq -r '[.assets | sort_by(.created_at) | reverse | .[] | .browser_download_url | select(test("darwin-amd64$"))][0]') && \
+    # Set Velociraptor version and base URL
+    VELO_VERSION="v0.74.2" && \
+    VELO_BASE_URL="v0.74" && \
+    # Get Velociraptor binaries for specific version
+    WINDOWS_EXE="https://github.com/Velocidex/velociraptor/releases/download/${VELO_BASE_URL}/velociraptor-${VELO_VERSION}-windows-amd64.exe" && \
+    WINDOWS_MSI="https://github.com/Velocidex/velociraptor/releases/download/${VELO_BASE_URL}/velociraptor-${VELO_VERSION}-windows-amd64.msi" && \
+    LINUX_BIN="https://github.com/Velocidex/velociraptor/releases/download/${VELO_BASE_URL}/velociraptor-${VELO_VERSION}-linux-amd64-musl" && \
+    MAC_BIN="https://github.com/Velocidex/velociraptor/releases/download/${VELO_BASE_URL}/velociraptor-${VELO_VERSION}-darwin-amd64" && \
     wget -O /opt/velociraptor/linux/velociraptor "$LINUX_BIN" && \
     wget -O /opt/velociraptor/mac/velociraptor_client "$MAC_BIN" && \
     wget -O /opt/velociraptor/windows/velociraptor_client.exe "$WINDOWS_EXE" && \
