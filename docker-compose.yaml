@@ -3,9 +3,11 @@ services:
   velociraptor:
     container_name: velociraptor
     image: wlambert/velociraptor
-    #build:
+    # build:
     #  context: ./
     #  dockerfile: Dockerfile
+    #  args:
+    #   VELOX_VERSION: ${VELOX_VERSION:-v0.75.1}
     volumes:
       - ./velociraptor:/velociraptor/:rw
     environment:

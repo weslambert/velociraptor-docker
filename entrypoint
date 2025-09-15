@@ -9,9 +9,26 @@ CLIENT_DIR="/velociraptor/clients"
 
 # Move binaries into place
 cp /opt/velociraptor/linux/velociraptor . && chmod +x velociraptor
-mkdir -p $CLIENT_DIR/linux && rsync -a /opt/velociraptor/linux/velociraptor /velociraptor/clients/linux/velociraptor_client
-mkdir -p $CLIENT_DIR/mac && rsync -a /opt/velociraptor/mac/velociraptor_client /velociraptor/clients/mac/velociraptor_client
-mkdir -p $CLIENT_DIR/windows && rsync -a /opt/velociraptor/windows/velociraptor_client* /velociraptor/clients/windows/
+# Linux
+if [ -s /opt/velociraptor/linux/velociraptor ]; then
+  mkdir -p $CLIENT_DIR/linux && rsync -a /opt/velociraptor/linux/velociraptor "$CLIENT_DIR/linux/velociraptor_client"
+else
+  echo "Linux binary not found, skipping"
+fi
+
+# Mac
+if [ -s /opt/velociraptor/mac/velociraptor_client ]; then
+  mkdir -p $CLIENT_DIR/mac && rsync -a /opt/velociraptor/mac/velociraptor_client "$CLIENT_DIR/mac/velociraptor_client"
+else
+  echo "Mac binary not found, skipping"
+fi
+
+# Windows (.exe and/or .msi)
+if ls /opt/velociraptor/windows/velociraptor_client* 1> /dev/null 2>&1; then
+  mkdir -p $CLIENT_DIR/windows && rsync -a /opt/velociraptor/windows/velociraptor_client* /velociraptor/clients/windows/
+else
+  echo "Windows binaries not found, skipping"
+fi
 
 # If no existing server config, set it up
 if [ ! -f server.config.yaml ]; then
@@ -38,9 +55,9 @@ fi
 ./velociraptor config repack --exe clients/linux/velociraptor_client client.config.yaml clients/linux/velociraptor_client_repacked
 ./velociraptor --config client.config.yaml debian client --output clients/linux/velociraptor_client_repacked.deb
 ./velociraptor --config client.config.yaml rpm client --output clients/linux/velociraptor_client_repacked.rpm
-./velociraptor config repack --exe clients/mac/velociraptor_client client.config.yaml clients/mac/velociraptor_client_repacked
-./velociraptor config repack --exe clients/windows/velociraptor_client.exe client.config.yaml clients/windows/velociraptor_client_repacked.exe
-./velociraptor config repack --msi clients/windows/velociraptor_client.msi client.config.yaml clients/windows/velociraptor_client_repacked.msi
+[ -s clients/mac/velociraptor_client ] && ./velociraptor config repack --exe clients/mac/velociraptor_client client.config.yaml clients/mac/velociraptor_client_repacked
+[ -s clients/windows/velociraptor_client.exe ] && ./velociraptor config repack --exe clients/windows/velociraptor_client.exe client.config.yaml clients/windows/velociraptor_client_repacked.exe
+[ -s clients/windows/velociraptor_client.msi ] && ./velociraptor config repack --msi clients/windows/velociraptor_client.msi client.config.yaml clients/windows/velociraptor_client_repacked.msi
 
 # Start Velocoraptor
 ./velociraptor --config server.config.yaml frontend -v
