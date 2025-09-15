@@ -1,23 +1,25 @@
 FROM ubuntu:22.04
-LABEL version="Velociraptor v0.73.4"
+ARG VELOX_VERSION
+LABEL version="Velociraptor $VELOX_VERSION"
 LABEL description="Velociraptor server in a Docker container"
 LABEL maintainer="Wes Lambert, @therealwlambert"
 COPY ./entrypoint .
 RUN chmod +x entrypoint && \
     apt-get update && \
-    apt-get install -y curl wget jq rsync && \
+    apt-get install -y curl jq rsync && \
     # Create dirs for Velo binaries
     mkdir -p /opt/velociraptor && \
     for i in linux mac windows; do mkdir -p /opt/velociraptor/$i; done && \
     # Get Velox binaries
-    WINDOWS_EXE=$(curl -s https://api.github.com/repos/velocidex/velociraptor/releases/latest | jq -r '[.assets | sort_by(.created_at) | reverse | .[] | .browser_download_url | select(test("windows-amd64.exe$"))][0]') && \
-    WINDOWS_MSI=$(curl -s https://api.github.com/repos/velocidex/velociraptor/releases/latest | jq -r '[.assets | sort_by(.created_at) | reverse | .[] | .browser_download_url | select(test("windows-amd64.msi$"))][0]') && \
-    LINUX_BIN=$(curl -s https://api.github.com/repos/velocidex/velociraptor/releases/latest | jq -r '[.assets | sort_by(.created_at) | reverse | .[] | .browser_download_url | select(test("linux-amd64$"))][0]') && \
-    MAC_BIN=$(curl -s https://api.github.com/repos/velocidex/velociraptor/releases/latest | jq -r '[.assets | sort_by(.created_at) | reverse | .[] | .browser_download_url | select(test("darwin-amd64$"))][0]') && \
-    wget -O /opt/velociraptor/linux/velociraptor "$LINUX_BIN" && \
-    wget -O /opt/velociraptor/mac/velociraptor_client "$MAC_BIN" && \
-    wget -O /opt/velociraptor/windows/velociraptor_client.exe "$WINDOWS_EXE" && \
-    wget -O /opt/velociraptor/windows/velociraptor_client.msi "$WINDOWS_MSI" && \
+    VELOX_RELEASE="${VELOX_VERSION%.*}"; \
+    WINDOWS_EXE="https://github.com/Velocidex/velociraptor/releases/download/${VELOX_RELEASE}/velociraptor-${VELOX_VERSION}-windows-amd64.exe" && \
+    WINDOWS_MSI="https://github.com/Velocidex/velociraptor/releases/download/${VELOX_RELEASE}/velociraptor-${VELOX_VERSION}-windows-amd64.msi" && \
+    LINUX_BIN="https://github.com/Velocidex/velociraptor/releases/download/${VELOX_RELEASE}/velociraptor-${VELOX_VERSION}-linux-amd64" && \
+    MAC_BIN="https://github.com/Velocidex/velociraptor/releases/download/${VELOX_RELEASE}/velociraptor-${VELOX_VERSION}-darwin-amd64" && \
+    curl -fL "$WINDOWS_EXE" -o /opt/velociraptor/windows/velociraptor_client.exe || echo "velociraptor-${VELOX_VERSION}-windows-amd64.exe not available" && \
+    curl -fL "$WINDOWS_MSI" -o /opt/velociraptor/windows/velociraptor_client.msi || echo "velociraptor-${VELOX_VERSION}-windows-amd64.msi not available" && \
+    curl -fL "$LINUX_BIN" -o /opt/velociraptor/linux/velociraptor || echo "velociraptor-${VELOX_VERSION}-linux-amd64 not available" && \
+    curl -fL "$MAC_BIN" -o /opt/velociraptor/mac/velociraptor_client || echo "velociraptor-${VELOX_VERSION}-darwin-amd64 not available" && \
     # Clean up
     apt-get remove -y --purge wget && \
     apt-get clean
