@@ -8,7 +8,7 @@ services:
     #  dockerfile: Dockerfile
     volumes:
       - ./velociraptor:/velociraptor/:rw
-      - /tmp/artifacts:/tmp/artifacts/:rw
+      - /data/tools/veloartifacts:/tmp/artifacts/:rw
     environment:
       - VELOX_USER=${VELOX_USER}
       - VELOX_PASSWORD=${VELOX_PASSWORD}
