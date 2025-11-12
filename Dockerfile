@@ -21,10 +21,10 @@ RUN chmod +x entrypoint && \
     MAC_BIN=$(curl -s https://api.github.com/repos/velocidex/velociraptor/releases/latest | jq -r '[.assets | sort_by(.created_at) | reverse | .[] | .browser_download_url | select(test("darwin-amd64$"))][0]') && \
     MAC_ARM_BIN=$(curl -s https://api.github.com/repos/velocidex/velociraptor/releases/latest | jq -r '[.assets | sort_by(.created_at) | reverse | .[] | .browser_download_url | select(test("darwin-arm64$"))][0]') && \
     #copy clients
-    wget -O /opt/velociraptor/linux/velociraptor "$LINUX_BIN" && \
-    wget -O /opt/velociraptor/linux/velociraptor_musl "$LINUX_MUSL_BIN" && \
-    wget -O /opt/velociraptor/linux/velociraptor_arm "$LINUX_ARM_BIN" && \
-    wget -O /opt/velociraptor/linux/velociraptor_freebsd "$FREEBSD_BIN" && \
+    wget -O /opt/velociraptor/linux/velociraptor_client "$LINUX_BIN" && \
+    wget -O /opt/velociraptor/linux/velociraptor_client_musl "$LINUX_MUSL_BIN" && \
+    wget -O /opt/velociraptor/linux/velociraptor_client_arm "$LINUX_ARM_BIN" && \
+    wget -O /opt/velociraptor/linux/velociraptor_client_freebsd "$FREEBSD_BIN" && \
     wget -O /opt/velociraptor/mac/velociraptor_client "$MAC_BIN" && \
     wget -O /opt/velociraptor/mac/velociraptor_client_arm "$MAC_ARM_BIN" && \
     wget -O /opt/velociraptor/windows/velociraptor_client.exe "$WINDOWS_EXE" && \
