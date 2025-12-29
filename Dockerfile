@@ -1,5 +1,5 @@
 FROM ubuntu:22.04
-LABEL version="Velociraptor v0.73.4"
+LABEL version="Velociraptor v0.75.6"
 LABEL description="Velociraptor server in a Docker container"
 LABEL maintainer="Wes Lambert, @therealwlambert"
 COPY ./entrypoint .
