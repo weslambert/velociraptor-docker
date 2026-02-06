@@ -26,7 +26,7 @@ if true | ./velociraptor --config server.config.yaml config show --json | jq -r 
   echo "Skipping renewal, certificate is not expired"
 else
   echo "Certificate is expired, rotating certificate."
-  ./velociraptor --config ./server.config.yaml config rotate_key > /tmp/server.config.yaml
+  ./velociraptor --config ./server.config.yaml config rotate_keys > /tmp/server.config.yaml
   cp ./server.config.yaml ./server.config.yaml.bak
   mv /tmp/server.config.yaml /velociraptor/.
 fi
