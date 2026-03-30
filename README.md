@@ -27,4 +27,4 @@ To pull only the Docker image:
 
 To pull a specific version of the Docker image:
 
-`docker pull wlambert/velociraptor:0.75.6`
+`docker pull wlambert/velociraptor:0.76.1`
