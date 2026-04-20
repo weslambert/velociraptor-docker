@@ -8,6 +8,7 @@ services:
     #  dockerfile: Dockerfile
     volumes:
       - ./velociraptor:/velociraptor/:rw
+      - /data/tools/veloartifacts:/tmp/artifacts/:rw
     environment:
       - VELOX_USER=${VELOX_USER}
       - VELOX_PASSWORD=${VELOX_PASSWORD}
@@ -19,3 +20,5 @@ services:
       - "8001:8001"
       - "8889:8889"
     restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
